@@ -1,0 +1,8 @@
+[package]
+name = "ic10opt"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+ic10emu = { path = "../ic10emu" }
+strum = { version = "0.26.2" }

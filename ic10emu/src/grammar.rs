@@ -889,7 +889,7 @@ impl FromStr for Label {
     }
 }
 
-#[derive(PartialEq, Eq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Hash, Debug, Clone, Serialize, Deserialize)]
 pub struct Identifier {
     pub name: String,
 }

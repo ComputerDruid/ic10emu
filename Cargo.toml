@@ -1,5 +1,5 @@
 [workspace]
-members = ["ic10lsp_wasm", "ic10emu_wasm", "ic10emu", "xtask"]
+members = ["ic10lsp_wasm", "ic10emu_wasm", "ic10emu", "xtask", "ic10opt"]
 resolver = "2"
 
 [workspace.package]
