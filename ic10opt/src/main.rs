@@ -121,12 +121,13 @@ fn main() {
             }
         }
     }
-    for (_new_line, i) in program
+    for (_new_line, (old_line, i)) in program
         .instructions
         .iter()
-        .filter(|i| i.instruction != InstructionOp::Nop)
+        .enumerate()
+        .filter(|(_, i)| i.instruction != InstructionOp::Nop)
         .enumerate()
     {
-        println!("{i}");
+        println!("{i} #l{old_line}");
     }
 }
