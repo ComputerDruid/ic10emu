@@ -1,0 +1,142 @@
+alias radiator d0
+alias coolingValve0 d1
+alias tank0 d2
+alias phase0Input d3
+alias phase3Input d4
+alias coldPipeAnalyzer d5
+define CoolantTargetTemp 213.15
+define MaxPhase0Gas 1210 # 0.5MPa@25C
+define MinPhase0Gas 484 # 0.2MPa@25C
+define MinPhase1Pressure 1500
+define MinPhase2Pressure 4000
+define TargetTemp 298.15
+define Furnace HASH("StructureFurnace")
+define Furnace1 HASH("Condensation Phase1 Furnace")
+define Furnace2 HASH("Condensation Phase2 Furnace")
+define VolumePump HASH("StructureVolumePump")
+define Input1 HASH("Condensation Phase1 Input")
+define Input2 HASH("Condensation Phase2 Input")
+define Input3 HASH("Condensation Phase3 Input")
+define GasTankSmall HASH("StructureTankSmall")
+define ExhaustTank HASH("Furnace Exhaust")
+define LiquidRegulator HASH("StructureLiquidPressureRegulator")
+define NOSStoragePump HASH("Condensation NOS Pump")
+define ExhaustMinPressure 1000
+define IdleThreshold 19.5
+alias rPhase0SettleCount r15
+alias rPhase1SettleCount r14
+alias rPhase2SettleCount r13
+alias rActivate r12
+top:
+move rPhase0SettleCount 0
+move rPhase1SettleCount 0
+move rPhase2SettleCount 0
+s phase0Input On 0
+s phase3Input On 0
+s phase3Input Lock 1
+s coldPipeAnalyzer On 1
+loop:
+yield
+l r0 coldPipeAnalyzer Temperature
+sgt r0 r0 CoolantTargetTemp
+s radiator Open r0
+lbn r0 GasTankSmall ExhaustTank Pressure Average
+sgt rActivate r0 ExhaustMinPressure
+s db Setting rPhase0SettleCount
+bgt rPhase0SettleCount IdleThreshold checkOff
+add rPhase0SettleCount rPhase0SettleCount 1
+bgt rPhase0SettleCount IdleThreshold checkOff
+l r0 tank0 TotalMoles
+slt r0 r0 MaxPhase0Gas
+and r2 r0 rActivate
+s phase0Input On r2
+l r1 tank0 Temperature
+sgt r0 r1 TargetTemp
+s coolingValve0 On r0
+bgt r1 TargetTemp resetcount0
+bnez r2 resetcount0 # pump still on
+l r0 tank0 RatioVolatiles
+bnez r0 resetcount0
+j phase1
+checkOff:
+beqz rActivate off
+j phase1
+resetcount0:
+move rPhase0SettleCount 0
+phase1:
+bgt rPhase1SettleCount IdleThreshold phase2
+add rPhase1SettleCount rPhase1SettleCount 1
+lbn r1 VolumePump Input1 On Average
+l r2 tank0 TotalMoles
+lbn r3 Furnace Furnace1 Pressure Average
+blt rPhase0SettleCount IdleThreshold phase1Idle
+blt r2 MinPhase0Gas phase0Unlock
+bgt r3 MinPhase1Pressure phase1Enough
+sbn VolumePump Input1 On 1
+j resetcount1
+phase1Enough:
+beqz r1 phase1Idle
+blt r3 2000 resetcount1 #keep loading for a bit
+phase0Unlock:
+sbn VolumePump Input1 On 0
+move rPhase0SettleCount 0
+phase1Idle:
+lbn r0 Furnace Furnace1 RatioLiquidNitrousOxide 0
+sgtz r0 r0
+sbn LiquidRegulator NOSStoragePump On r0
+bgtz r0 resetcount1
+blt r3 MinPhase1Pressure resetcount1
+bnez r1 resetcount1
+lbn r0 Furnace Furnace1 RatioNitrousOxide Average
+bgt r0 0 resetcount1
+j phase2
+resetcount1:
+move rPhase1SettleCount 0
+phase2:
+bgt rPhase2SettleCount IdleThreshold phase3
+add rPhase2SettleCount rPhase2SettleCount 1
+lbn r0 Furnace Furnace2 Pressure Average
+lbn r1 VolumePump Input2 On Average
+lbn r2 Furnace Furnace1 Pressure Average
+blt rPhase1SettleCount IdleThreshold phase2Idle
+blt r2 500 phase1Unlock
+bgt r0 MinPhase2Pressure phase2Enough
+sbn VolumePump Input2 On 1
+j resetcount2
+phase2Enough:
+beqz r1 phase2Idle
+blt r0 5000 resetcount2 # keep loading for a bit
+phase1Unlock:
+sbn VolumePump Input2 On 0
+move rPhase1SettleCount 0
+phase2Idle:
+blt r0 MinPhase2Pressure resetcount2
+bnez r1 resetcount2
+lbn r0 Furnace Furnace2 RatioPollutant Average
+bgt r0 0 resetcount2
+lbn r0 Furnace Furnace2 RatioLiquidPollutant Average
+bgt r0 0 resetcount2
+j phase3
+resetcount2:
+move rPhase2SettleCount 0
+phase3:
+blt rPhase2SettleCount IdleThreshold phase3Done
+lbn r0 Furnace Furnace2 Pressure Average
+sgt r0 r0 1000
+sbn VolumePump Input3 On r0
+bnez r0 phase3Done
+move rPhase2SettleCount 0 #unlock
+phase3Done:
+j loop
+off:
+yield
+s radiator Open 0
+s coolingValve0 On 0
+s phase0Input On 0
+s phase3Input Lock 0
+s coldPipeAnalyzer On 0
+sbn VolumePump Input1 On 0
+sbn VolumePump Input2 On 0
+s db On 0
+yield
+j top

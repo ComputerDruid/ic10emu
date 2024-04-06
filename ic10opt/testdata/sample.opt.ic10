@@ -1,0 +1,102 @@
+alias radiator d0 #l0
+alias coolingValve0 d1 #l1
+alias tank0 d2 #l2
+alias phase0Input d3 #l3
+alias phase3Input d4 #l4
+alias coldPipeAnalyzer d5 #l5
+move r15 0 #l30
+move r14 0 #l31
+move r13 0 #l32
+s d3 28 0 #l33
+s d4 28 0 #l34
+s d4 10 1 #l35
+s d5 28 1 #l36
+yield #l38
+l r0 d5 6 #l39
+sgt r0 r0 213.15 #l40
+s d0 2 r0 #l41
+lbn r0 1013514688 -737731684 5 0 #l42
+sgt r12 r0 1000 #l43
+s db 12 r15 #l44
+bgt r15 19.5 35 #l45
+add r15 r15 1 #l46
+bgt r15 19.5 35 #l47
+l r0 d2 66 #l48
+slt r0 r0 1210 #l49
+and r2 r0 r12 #l50
+s d3 28 r2 #l51
+l r1 d2 6 #l52
+sgt r0 r1 298.15 #l53
+s d1 28 r0 #l54
+bgt r1 298.15 37 #l55
+bnez r2 37 #l56
+l r0 d2 18 #l57
+bnez r0 37 #l58
+j 38 #l59
+beqz r12 91 #l61
+j 38 #l62
+move r15 0 #l64
+bgt r14 19.5 62 #l66
+add r14 r14 1 #l67
+lbn r1 -321403609 -572782430 28 0 #l68
+l r2 d2 66 #l69
+lbn r3 1947944864 -665365475 5 0 #l70
+blt r15 19.5 52 #l71
+blt r2 484 50 #l72
+bgt r3 1500 48 #l73
+sbn -321403609 -572782430 28 1 #l74
+j 61 #l75
+beqz r1 52 #l77
+blt r3 2000 61 #l78
+sbn -321403609 -572782430 28 0 #l80
+move r15 0 #l81
+lbn r0 1947944864 -665365475 209 0 #l83
+sgtz r0 r0 #l84
+sbn 482248766 -1960652107 28 r0 #l85
+bgtz r0 61 #l86
+blt r3 1500 61 #l87
+bnez r1 61 #l88
+lbn r0 1947944864 -665365475 83 0 #l89
+bgt r0 0 61 #l90
+j 62 #l91
+move r14 0 #l93
+bgt r13 19.5 84 #l95
+add r13 r13 1 #l96
+lbn r0 1947944864 -505780008 5 0 #l97
+lbn r1 -321403609 -332131777 28 0 #l98
+lbn r2 1947944864 -665365475 5 0 #l99
+blt r14 19.5 76 #l100
+blt r2 500 74 #l101
+bgt r0 4000 72 #l102
+sbn -321403609 -332131777 28 1 #l103
+j 83 #l104
+beqz r1 76 #l106
+blt r0 5000 83 #l107
+sbn -321403609 -332131777 28 0 #l109
+move r14 0 #l110
+blt r0 4000 83 #l112
+bnez r1 83 #l113
+lbn r0 1947944864 -505780008 17 0 #l114
+bgt r0 0 83 #l115
+lbn r0 1947944864 -505780008 204 0 #l116
+bgt r0 0 83 #l117
+j 84 #l118
+move r13 0 #l120
+blt r13 19.5 90 #l122
+lbn r0 1947944864 -505780008 5 0 #l123
+sgt r0 r0 1000 #l124
+sbn -321403609 1245911435 28 r0 #l125
+bnez r0 90 #l126
+move r13 0 #l127
+j 13 #l129
+yield #l131
+s d0 2 0 #l132
+s d1 28 0 #l133
+s d3 28 0 #l134
+s d4 10 0 #l135
+s d5 28 0 #l136
+sbn -321403609 -572782430 28 0 #l137
+sbn -321403609 -332131777 28 0 #l138
+s db 28 0 #l139
+yield #l140
+j 6 #l141
